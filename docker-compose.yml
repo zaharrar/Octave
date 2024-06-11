@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgresql
+    environment:
+      - DATABASE_URL=postgresql://postgres:toor@postgresql:5432/octave
+
+  postgresql:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: octave
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: toor
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

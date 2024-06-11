@@ -1,0 +1,5 @@
+Django==4.2.13
+paho_mqtt==2.1.0
+pytest==8.2.2
+psycopg2-binary
+pytest-freezegun
