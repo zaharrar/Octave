@@ -17,7 +17,7 @@ def battery_view(request):
             capacity_kwh = int(body.get("capacity_kwh"))
             maximum_power_kw = int(body.get("maximum_power_kw"))
         except Exception as e:
-            return JsonResponse({"error": "Invalid parameters"}, status=400)
+            return JsonResponse({"error": f"Could not create battery: {e}"}, status=400)
         bat = OctaveBattery(capacity=capacity_kwh, maximum_power=maximum_power_kw)
         bat.save()  # creates the instance of the object in the database
         response_data = {
@@ -37,9 +37,7 @@ def delete_view(request, _id):
         try:
             bat = OctaveBattery.objects.get(id=_id)
         except Exception as e:
-            return JsonResponse(
-                {"error": f"Battery with id {_id} does not exist"}, status=400
-            )
+            return JsonResponse({"error": f"Could not delete battery: {e}"}, status=400)
         bat.delete()
         return JsonResponse(
             {"success": f"Battery with id {_id} successfully deleted"}, status=200
@@ -54,10 +52,11 @@ def update_view(request):
         try:
             _id = int(request.GET.get("battery_id"))
             power = int(request.GET.get("power"))
+            bat = OctaveBattery.objects.get(id=_id)
+            bat_cont = BatteryController(battery=bat)
         except Exception as e:
-            return JsonResponse({"error": "Invalid parameters"}, status=400)
-        bat = OctaveBattery.objects.get(id=_id)
-        bat_cont = BatteryController(battery=bat)
+            return JsonResponse({"error": f"Could not update battery: {e}"}, status=400)
+
         bat_cont.charge(power)
         return JsonResponse(
             {"message": f"battery {_id} charged at {100*(bat.state_of_charge)}%"}
